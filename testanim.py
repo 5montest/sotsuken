@@ -5,23 +5,12 @@ import matplotlib.animation as animation    #アニメーション
 
 from mpl_toolkits.mplot3d import Axes3D     #3次元
 
-THETA = 45
-THETA_S = 45
+fig = plt.figure()
 
-N0 = 1
+def plot(data):
+    plt.cla()                      # 現在描写されているグラフを消去
+    rand = np.random.randn(100)    # 100個の乱数を生成
+    im = plt.plot(rand)            # グラフを生成
 
-BS = 0.005
-D = 10
-P1 = 3
-P2 = 3
-LAMBDA1 = 780
-LAMBDA2 = 779
-
-W1 = 3
-W2 = 3
-
-L1 = 0.05
-L2 = 0.1
-L3 = 1
-L4 = 1
-
+ani = animation.FuncAnimation(fig, plot, interval=100)
+plt.show()
