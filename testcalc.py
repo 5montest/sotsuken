@@ -2,6 +2,9 @@
 import math
 import numpy as np
 
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
+
     #可変パラメータ
 theta = 45
 theta_s = 45
@@ -84,14 +87,73 @@ M1 = (-2 * math.pi / (ramda1 * 10 ** -9)) * ((C * t) - (L1 + L0 * Quaref1 + L3 +
 M11d = (-2 * math.pi / (ramda1 * 10 ** -9)) * ((C * t) - (L10 + L0 * Quaref1 + L30 + L4 + L5 * ITOref1))
 
 M2 = (-2 * math.pi / (ramda2 * 10 ** -9)) * ((C * t) - (L2 + L3 + L4))
-M2d = (-2 * math.pi / (ramda2 * 10 ** -9)) * ((C * t) - (L20 + L30d + L4 + L5d * ITOref2))
+M22d = (-2 * math.pi / (ramda2 * 10 ** -9)) * ((C * t) - (L20 + L30d + L4 + L5d * ITOref2))
 
-MR1 = np.array
-MR2 = np.matrix()
-BR1 = np.matrix()
-BR2 = np.matrix()
+MA = np.zeros((41,41))
+MB = np.zeros((41,41))
+MC = np.zeros((41,41))
+MD = np.zeros((41,41))
 
-In = np.matrix()
+IS = np.array((41,41))
+
+S = -10
+
+for i in range(41):
+    V = -10
+    for j in range(41):
+        MA[i,j] = R1 * math.sqrt((2 * P1 * 10 ** -3) / (C * ipsy * math.pi * W1 ** 2)) * math.exp(-(V ** 2 + S ** 2) / (2 * W1 ** 2))
+        V += 0.5
+    S += 0.5
+
+S = -10
+
+for i in range(41):
+    V = -10
+    for j in range(41):
+        MB[i,j] = T1 * math.sqrt((2 * P1 * 10 ** -3) / (C * ipsy * math.pi * W1 ** 2)) * math.exp(-(V ** 2 + S ** 2) / (2 * W1 ** 2))
+        V += 0.5
+    S += 0.5
+
+S = -10
+
+for i in range(41):
+    V = -10
+    for j in range(41):
+        MC[i,j] = R2 * math.sqrt((2 * P1 * 10 ** -3) / (C * ipsy * math.pi * W1 ** 2)) * math.exp(-(V ** 2 + S ** 2) / (2 * W1 ** 2))
+        V += 0.5
+    S += 0.5
+
+S = -10
+
+for i in range(41):
+    V = -10
+    for j in range(41):
+        MD[i,j] = T2 * math.sqrt((2 * P1 * 10 ** -3) / (C * ipsy * math.pi * W1 ** 2)) * math.exp(-(V ** 2 + S ** 2) / (2 * W1 ** 2))
+        V += 0.5
+    S += 0.5
+
+S = -10
+
+
+for i in range(41):
+    for j in range(41):
+        IS[i,j] = (((MA[i,j] ** 2) + (MB[i,j] ** 2) + (MC[i,j] ** 2) + (MD[i,j] ** 2)) + 2 
+                    * (MA[i,j] * MB[i,j] * math.cos(M1 - M11d) + MA[i,j] * MC[i,j] * math.cos(M1 - M2) 
+                    + MA[i,j] * MD[i,j] * math.cos(M1 - M22d) + MB[i,j] * MC[i,j] * math.cos(M11d - M2)
+                    + MB[i,j] * MD[i,j] * math.cos(M11d - M22d) + MC[i,j] * MD[i,j] * math.cos(M2 - M22d))) * C * ipsy / 2
+S = -10
+
+flg = plt.figure()
+ax = Axes3D(flg)
+ax.plot(IS[:,0], IS[:,1], IS[:,2])
+plt.show()
+
+print (MA)
+print (MB)
+print (MC)
+print (MD)
+
+print (IS)
 
 print (theta)
 print (theta_s)
@@ -147,4 +209,4 @@ print (t)
 print (M1)
 print (M11d)
 print (M2)
-print (M2d)
+print (M22d)
