@@ -1,6 +1,7 @@
 
 import math
 import numpy as np
+import pandas as pd
 
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
@@ -94,7 +95,7 @@ MB = np.zeros((41,41))
 MC = np.zeros((41,41))
 MD = np.zeros((41,41))
 
-IS = np.array((41,41))
+IS = np.zeros((42,42))
 
 S = -10
 
@@ -137,17 +138,24 @@ S = -10
 
 for i in range(41):
     for j in range(41):
-        IS[i,j] = (((MA[i,j] ** 2) + (MB[i,j] ** 2) + (MC[i,j] ** 2) + (MD[i,j] ** 2)) + 2 
+        IS[i+1,j+1] = (((MA[i,j] ** 2) + (MB[i,j] ** 2) + (MC[i,j] ** 2) + (MD[i,j] ** 2)) + 2 
                     * (MA[i,j] * MB[i,j] * math.cos(M1 - M11d) + MA[i,j] * MC[i,j] * math.cos(M1 - M2) 
                     + MA[i,j] * MD[i,j] * math.cos(M1 - M22d) + MB[i,j] * MC[i,j] * math.cos(M11d - M2)
                     + MB[i,j] * MD[i,j] * math.cos(M11d - M22d) + MC[i,j] * MD[i,j] * math.cos(M2 - M22d))) * C * ipsy / 2
-S = -10
 
-flg = plt.figure()
-ax = Axes3D(flg)
-ax.plot(IS[:,0], IS[:,1], IS[:,2])
+
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+
+x = y = np.arange(-10,10.5,0.5)
+X, Y = np.meshgrid(x, y)
+Z = IS.as_matrix()
+
+surf = ax.plot_surface(X, Y, Z)
+
 plt.show()
 
+"""
 print (MA)
 print (MB)
 print (MC)
@@ -210,3 +218,5 @@ print (M1)
 print (M11d)
 print (M2)
 print (M22d)
+
+"""
