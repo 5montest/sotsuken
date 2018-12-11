@@ -1,5 +1,6 @@
 import tkinter as Tkinter                   #GUI
 import math                                 #数学関数
+import sys
 
 import numpy as np                          #データ処理
 import matplotlib.pyplot as plt             #プロット
@@ -154,23 +155,41 @@ def calc(t,theta,theta_s):
                         + MB[i,j] * MD[i,j] * math.cos(M11d - M22d) + MC[i,j] * MD[i,j] * math.cos(M2 - M22d))) * C * ipsy / 2
     return IS
 
+def input_val():
+    print ("tmin[ps]")
+    tmin = input('>>')
+    print ("tmax[ps]")
+    tmax = input('>>')
+    print ("step")
+    step = input('>>')
 
-def main():
+    tmax = float(tmax)
+    tmin = float(tmin)
+    step = float(step)
+
+    abs = tmax - tmin
+    frame = abs / step
+
+    frame = int(frame)
+
+    main(tmin,tmax,step,abs,frame)
+
+def main(tmin,tmax,step,abs,frame):
     fig = plt.figure()
     ax = Axes3D(fig)
 
-    for cnt in range(20):
+    for cnt in range(frame):
         plt.cla()
         ax.set_zlim([0,0.00045])
         x = y = np.arange(-10,10.5,0.5)
         X, Y = np.meshgrid(x, y)
 
-        IS = calc(cnt * 10 ** -13,45,45)
+        IS = calc((tmin + (step * cnt)) * 10 ** -12,45,45)
         Z = np.matrix(IS)
         surf = ax.plot_surface(X, Y, Z)
 
 
-        plt.pause(0.01)
+        plt.pause(0.001)
 
 if __name__ == '__main__':
-    main()
+    input_val()
