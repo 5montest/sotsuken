@@ -13,8 +13,8 @@ from mpl_toolkits.mplot3d import Axes3D     #3次元
 #root.geometry("1280x720")
 #root.geometry("1920x1080")
 
-def calc(t,theta,theta_s):
 
+def calc(t,theta,theta_s,arr1,arr2):
     #可変パラメータ
     #theta = 45
     #theta_s = 45
@@ -110,49 +110,21 @@ def calc(t,theta,theta_s):
     S = -10
 
     #電界項の計算
-    for i in range(41):
-        V = -10
-        for j in range(41):
-            MA[i,j] = R1 * math.sqrt((2 * P1 * 10 ** -3) / (C * ipsy * math.pi * W1 ** 2)) * math.exp(-(V ** 2 + S ** 2) / (2 * W1 ** 2))
-            V += 0.5
-        S += 0.5
+    MA = R1 * math.sqrt((2 * P1 * 10 ** -3) / (C * ipsy * math.pi * W1 ** 2)) * np.exp(-(arr1 + arr2 ) / (2 * W1 ** 2))
 
-    S = -10
+    MB = T1 * math.sqrt((2 * P1 * 10 ** -3) / (C * ipsy * math.pi * W1 ** 2)) * np.exp(-(arr1 + arr2) / (2 * W1 ** 2))
 
-    for i in range(41):
-        V = -10
-        for j in range(41):
-            MB[i,j] = T1 * math.sqrt((2 * P1 * 10 ** -3) / (C * ipsy * math.pi * W1 ** 2)) * math.exp(-(V ** 2 + S ** 2) / (2 * W1 ** 2))
-            V += 0.5
-        S += 0.5
+    MC = R2 * math.sqrt((2 * P1 * 10 ** -3) / (C * ipsy * math.pi * W1 ** 2)) * np.exp(-(arr1 + arr2) / (2 * W1 ** 2))
 
-    S = -10
+    MD = T2 * math.sqrt((2 * P1 * 10 ** -3) / (C * ipsy * math.pi * W1 ** 2)) * np.exp(-(arr1 + arr2) / (2 * W1 ** 2))
 
-    for i in range(41):
-        V = -10
-        for j in range(41):
-            MC[i,j] = R2 * math.sqrt((2 * P1 * 10 ** -3) / (C * ipsy * math.pi * W1 ** 2)) * math.exp(-(V ** 2 + S ** 2) / (2 * W1 ** 2))
-            V += 0.5
-        S += 0.5
-
-    S = -10
-
-    for i in range(41):
-        V = -10
-        for j in range(41):
-            MD[i,j] = T2 * math.sqrt((2 * P1 * 10 ** -3) / (C * ipsy * math.pi * W1 ** 2)) * math.exp(-(V ** 2 + S ** 2) / (2 * W1 ** 2))
-            V += 0.5
-        S += 0.5
-
-    S = -10
 
     #光強度の計算
-    for i in range(41):
-        for j in range(41):
-            IS[i,j] = (((MA[i,j] ** 2) + (MB[i,j] ** 2) + (MC[i,j] ** 2) + (MD[i,j] ** 2)) + 2 
-                        * (MA[i,j] * MB[i,j] * math.cos(M1 - M11d) + MA[i,j] * MC[i,j] * math.cos(M1 - M2) 
-                        + MA[i,j] * MD[i,j] * math.cos(M1 - M22d) + MB[i,j] * MC[i,j] * math.cos(M11d - M2)
-                        + MB[i,j] * MD[i,j] * math.cos(M11d - M22d) + MC[i,j] * MD[i,j] * math.cos(M2 - M22d))) * C * ipsy / 2
+    IS = (((MA ** 2) + (MB ** 2) + (MC ** 2) + (MD ** 2)) + 2 
+                * (MA * MB * math.cos(M1 - M11d) + MA * MC * math.cos(M1 - M2) 
+                + MA * MD * math.cos(M1 - M22d) + MB * MC * math.cos(M11d - M2)
+                + MB * MD * math.cos(M11d - M22d) + MC * MD * math.cos(M2 - M22d))) * C * ipsy / 2
+
     return IS
 
 def input_val():
@@ -177,19 +149,20 @@ def input_val():
 def main(tmin,tmax,step,abs,frame):
     fig = plt.figure()
     ax = Axes3D(fig)
+    x = y = np.arange(-10,10.5,0.5)
+    X, Y = np.meshgrid(x, y)
+    arr1 = X ** 2
+    arr2 = X.transpose() ** 2
 
     for cnt in range(frame):
         plt.cla()
         ax.set_zlim([0,0.00045])
-        x = y = np.arange(-10,10.5,0.5)
-        X, Y = np.meshgrid(x, y)
-
-        IS = calc((tmin + (step * cnt)) * 10 ** -12,45,45)
+        IS = calc((tmin + (step * cnt)) * 10 ** -12,45,45,arr1,arr2)
         Z = np.matrix(IS)
         surf = ax.plot_surface(X, Y, Z)
 
 
-        plt.pause(0.001)
+        plt.pause(0.0001)
 
 if __name__ == '__main__':
     input_val()
