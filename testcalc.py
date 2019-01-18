@@ -157,7 +157,7 @@ surf = ax.plot_surface(X, Y, Z)
 
 plt.show()
 
-"""
+
 print (MA)
 print (MB)
 print (MC)
@@ -220,5 +220,3 @@ print (M1)
 print (M11d)
 print (M2)
 print (M22d)
-
-"""
