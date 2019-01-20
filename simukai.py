@@ -145,22 +145,31 @@ def input_val():
 def main(ramda1,ramda2,T,frame):
     t = 0
 
-    fig = plt.figure()
+    fig = plt.figure(figsize=(6, 4.5))
     ax = Axes3D(fig)
     x = y = np.arange(-10,10.5,0.5)
     X, Y = np.meshgrid(x, y)
     arr1 = X ** 2
     arr2 = X.transpose() ** 2
 
-    for cnt in range(frame):
-        t+= T/frame
+
+    for cnt in range(frame+1):
         plt.cla()
         ax.set_zlim([0,0.00045])
         IS = calc(ramda1,ramda2,45,45,arr1,arr2,t)
         Z = np.matrix(IS)
-        surf = ax.plot_surface(X, Y, Z)
+        surf = ax.plot_wireframe(X, Y, Z)
 
+        plt.title("t="+str(round((t*10**12),2))+" [ps]",fontsize=24)
+        ax.set_xlabel("[mm]",fontsize=14)
+        ax.set_ylabel("[mm]",fontsize=14)
+        ax.set_zlabel("[a.u.]",fontsize=14)
+        ax.view_init(30, 45)
+        plt.tick_params(labelsize = 11)
+        plt.gca().ticklabel_format(style="sci", scilimits=(0,0), axis="z")
+        plt.savefig("testSci"+str(cnt)+".png")
         plt.pause(0.0001)
+        t+= T/frame
 
 if __name__ == '__main__':
     input_val()
