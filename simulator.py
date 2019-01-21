@@ -6,7 +6,7 @@ import numpy as np                          #データ処理
 import matplotlib.pyplot as plt             #プロット
 
 from mpl_toolkits.mplot3d import Axes3D     #3次元
-
+from matplotlib.ticker import ScalarFormatter
 
 #root = Tkinter.Tk()
 #root.title(u"2-beam_Fizeau")
@@ -147,20 +147,33 @@ def input_val():
     main(tmin,tmax,step,abs,frame)
 
 def main(tmin,tmax,step,abs,frame):
-    fig = plt.figure()
+    #fig = plt.figure()
+    fig = plt.figure(figsize=(5, 5))
     ax = Axes3D(fig)
     x = y = np.arange(-10,10.5,0.5)
     X, Y = np.meshgrid(x, y)
     arr1 = X ** 2
     arr2 = X.transpose() ** 2
 
-    for cnt in range(frame):
+
+    for cnt in range(frame+1):
         plt.cla()
         ax.set_zlim([0,0.00045])
         IS = calc((tmin + (step * cnt)) * 10 ** -12,45,45,arr1,arr2)
+        print (np.ndarray.max(IS))
         Z = np.matrix(IS)
-        surf = ax.plot_surface(X, Y, Z)
+        surf = ax.plot_surface(X, Y, Z,color='white',edgecolor='g',shade=False)
 
+        #plt.title("t="+str(round(tmin+(step*cnt),2))+" [ps]",fontsize=24)
+        ax.set_xlabel("[mm]",fontsize=18)
+        ax.set_ylabel("[mm]",fontsize=18)
+        ax.set_zlabel("[a.u.]",fontsize=18)
+        ax.view_init(25, 45)
+        plt.tick_params(labelsize = 20)
+        ax.zaxis.set_major_formatter(ScalarFormatter(useMathText=True))
+        plt.gca().ticklabel_format(style="sci", scilimits=(0,0), axis="z")
+        ax.zaxis.offsetText.set_fontsize(20)
+        plt.savefig("testSci"+str(cnt)+".png",bbox_inches="tight")
 
         plt.pause(0.0001)
 

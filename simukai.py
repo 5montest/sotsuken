@@ -145,7 +145,8 @@ def input_val():
 def main(ramda1,ramda2,T,frame):
     t = 0
 
-    fig = plt.figure(figsize=(6, 4.5))
+    fig = plt.figure(figsize=(5, 5))
+    #fig = plt.figure()
     ax = Axes3D(fig)
     x = y = np.arange(-10,10.5,0.5)
     X, Y = np.meshgrid(x, y)
@@ -165,9 +166,9 @@ def main(ramda1,ramda2,T,frame):
         ax.set_ylabel("[mm]",fontsize=14)
         ax.set_zlabel("[a.u.]",fontsize=14)
         ax.view_init(30, 45)
-        plt.tick_params(labelsize = 11)
+        plt.tick_params(labelsize = 16)
         plt.gca().ticklabel_format(style="sci", scilimits=(0,0), axis="z")
-        plt.savefig("testSci"+str(cnt)+".png")
+        plt.savefig("testSci"+str(cnt)+".png",bbox_inches="tight")
         plt.pause(0.0001)
         t+= T/frame
 
