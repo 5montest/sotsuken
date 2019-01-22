@@ -22,8 +22,8 @@ def calc(t,theta,theta_s,arr1,arr2):
 
     #定数
     d = 10
-    ramda1 = 780
-    ramda2 = 779
+    ramda1 = 637
+    ramda2 = 639
 
     P1 = 3
     P2 = 3
@@ -61,8 +61,8 @@ def calc(t,theta,theta_s,arr1,arr2):
 
 
     #レーザ間隔X
-    X1 = 2 * d * (10 ** -6) * math.tan(math.radians(Itheta_t1)) * math.cos(math.radians(theta))
-    X2 = 2 * d * (10 ** -6) * math.tan(math.radians(Itheta_t2)) * math.cos(math.radians(theta))
+    X1 = 2 * d1 * (10 ** -6) * math.cos(math.radians(theta)) * math.tan(math.radians(Itheta_t1))
+    X2 = 2 * d1 * (10 ** -6) * math.cos(math.radians(theta_s)) * math.tan(math.radians(Itheta_t2))
 
     #光路計算
     #後退光路
@@ -74,6 +74,8 @@ def calc(t,theta,theta_s,arr1,arr2):
     #材料光路
     L5 = (2 * d * 10 ** -6) / math.cos(math.radians(ITOref1))
     L5d = (2 * d * 10 ** -6) / math.cos(math.radians(ITOref2))
+    L50 = d3 * 10 ** -6 / math.cos(math.radians(Itheta_t1))
+    L50d = d3 * 10 ** -6 / math.cos(math.radians(Itheta_t2))
     #BS内光路
     L0 = sigma / math.cos(math.asin((math.sin(math.radians(theta))) / Quaref1))
 
@@ -116,23 +118,29 @@ def calc(t,theta,theta_s,arr1,arr2):
 
     IS = np.zeros((41,41))
 
-    S = -10
+    Sramda1 = math.sin(math.radians(90 - 34.3 - Itheta_t1)) * L50 * 1000
+    Sramda2 = math.sin(math.radians(90 - 34.3 - Itheta_t2)) * L50d * 1000
+
+    S = np.abs(Sramda1 - Sramda2) * 1000
 
     #電界項の計算
-    MA = R1 * math.sqrt((2 * P1 * 10 ** -3) / (C * ipsy * math.pi * W1 ** 2)) * np.exp(-(arr1 + arr2 ) / (2 * W1 ** 2))
 
-    MB = T1 * math.sqrt((2 * P1 * 10 ** -3) / (C * ipsy * math.pi * W1 ** 2)) * np.exp(-(arr1 + arr2) / (2 * W1 ** 2))
+    MA = R1 * T1 * math.sqrt((2 * P1 * 10 ** -3) / (C * ipsy * math.pi * W1 ** 2)) * np.exp(-((arr1 + 0) ** 2 + arr2 ** 2) / (2 * (W1 ** 2)))
 
-    MC = R2 * math.sqrt((2 * P1 * 10 ** -3) / (C * ipsy * math.pi * W1 ** 2)) * np.exp(-(arr1 + arr2) / (2 * W1 ** 2))
+    MB = T1 ** 2 * math.sqrt((2 * P1 * 10 ** -3) / (C * ipsy * math.pi * W1 ** 2)) * np.exp(-((arr1 + 0) ** 2 + arr2 ** 2) / (2 * (W1 ** 2)))
 
-    MD = T2 * math.sqrt((2 * P1 * 10 ** -3) / (C * ipsy * math.pi * W1 ** 2)) * np.exp(-(arr1 + arr2) / (2 * W1 ** 2))
+    MC = R2 * T2 * math.sqrt((2 * P2 * 10 ** -3) / (C * ipsy * math.pi * W2 ** 2)) * np.exp(-((arr1 + S) ** 2 + arr2 ** 2) / (2 * (W2 ** 2)))
 
+    MD = T2 ** 2 * math.sqrt((2 * P2 * 10 ** -3) / (C * ipsy * math.pi * W2 ** 2)) * np.exp(-((arr1 + S) ** 2 + arr2 ** 2) / (2 * (W2 ** 2)))
+
+    print (MD)
 
     #光強度の計算
     IS = (((MA ** 2) + (MB ** 2) + (MC ** 2) + (MD ** 2)) + 2 
                 * (MA * MB * math.cos(M1 - M11d) + MA * MC * math.cos(M1 - M2) 
                 + MA * MD * math.cos(M1 - M22d) + MB * MC * math.cos(M11d - M2)
                 + MB * MD * math.cos(M11d - M22d) + MC * MD * math.cos(M2 - M22d))) * C * ipsy / 2
+
 
     return IS
 
@@ -159,17 +167,22 @@ def main(tmin,tmax,step,abs,frame):
     #fig = plt.figure()
     fig = plt.figure(figsize=(5, 5))
     ax = Axes3D(fig)
-    x = y = np.arange(-10,10.5,0.5)
+    x = y = np.arange(-0.04,0.042,0.002)
+    #x = y = np.array([-0.04,-0.038,-0.036,-0.034,-0.032,-0.03,-0.028,-0.026,-0.024,-0.022,-0.02,-0.018,-0.16,-0.014,-0.012,-0.01,-0.008,-0.006,-0.004,-0.002,0,0.002,0.004,0.006,0.008,0.01,0.12,0.014,0.016,0.018,0.02,0.022,0.024,0.026,0.028,0.03,0.032,0.034,0.036,0.038,0.04])
     X, Y = np.meshgrid(x, y)
-    arr1 = X ** 2
-    arr2 = X.transpose() ** 2
+   
+    arr1 = X 
 
+    arr2 = X.transpose()
 
     for cnt in range(frame+1):
         plt.cla()
-        ax.set_zlim([0,0.00045])
+        #ax.set_zlim([0,12])
+        #ax.set_xlim([-0.04,0.04])
+        #ax.set_ylim([-0.04,0.04])
         IS = calc((tmin + (step * cnt)) * 10 ** -12,45,45,arr1,arr2)
-        print (np.ndarray.max(IS))
+
+        #print (np.ndarray.max(IS))
         Z = np.matrix(IS)
         surf = ax.plot_surface(X, Y, Z,color='white',edgecolor='g',shade=False)
 
